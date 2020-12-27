@@ -1,20 +1,26 @@
 package com.apollo.resource.model;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 @Data
+@RequiredArgsConstructor
 public class Resource {
 
     private final String resourceId = UUID.randomUUID().toString();
     private final Date resourceCreationDate = Calendar.getInstance().getTime();
-    private String resourceName, resourceUrl, resourcesOwnerId;
-    private boolean isActive, isPublic;
-    private HashSet<String> resourceViewers;
+    private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
+    private String resourceUrl;// what is S3?
+    private String resourcesOwnerId;
+    private boolean isActive =true, isPublic = false;
+    private HashSet<String> resourceViewers = new HashSet<>();
+
+    public void addResourceViewer (List<String> ViewersIds){
+        this.resourceViewers.addAll(ViewersIds);
+    }
+
 
 }
 
