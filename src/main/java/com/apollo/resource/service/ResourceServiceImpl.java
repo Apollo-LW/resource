@@ -54,6 +54,7 @@ public class ResourceServiceImpl implements ResourceService{
    @Override
      public Mono<Boolean> shareResourceFlag(String ownerId, String resourceId, boolean flag) {
 
+               return null;
    }
 
    @Override

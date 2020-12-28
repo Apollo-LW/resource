@@ -1,7 +1,7 @@
 package com.apollo.resource.service;
 
 import com.apollo.resource.model.Resource;
-import com.apollo.resource.model.ResourceOwner;
+import com.apollo.resource.model.ResourceUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -14,10 +14,10 @@ public class ResourceUserServiceImpl implements ResourceUserService{
 
     @Value("${user.kafka.store}")
     private String resourceUserStateStoreName;
-    private ReadOnlyKeyValueStore<String, ResourceOwner> resourceUserStateStore;
+    private ReadOnlyKeyValueStore<String, ResourceUser> resourceUserStateStore;
     private final InteractiveQueryService interactiveQueryService;
 
-    private ReadOnlyKeyValueStore<String, ResourceOwner> getResourceUserStateStore(){
+    private ReadOnlyKeyValueStore<String, ResourceUser> getResourceUserStateStore(){
         if(this.resourceUserStateStore == null)
             this.resourceUserStateStore = this.interactiveQueryService.getQueryableStore(this.resourceUserStateStoreName , QueryableStoreTypes.keyValueStore());
             return this.resourceUserStateStore;
