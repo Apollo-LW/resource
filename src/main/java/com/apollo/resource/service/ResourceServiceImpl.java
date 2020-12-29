@@ -31,6 +31,11 @@ public class ResourceServiceImpl implements ResourceService{
 
 
     @Override
+    public Mono<Optional<Resource>> getResourceByID(String resourceId) {
+        return Mono.just(Optional.ofNullable(this.getResourceStateStore().get(resourceId)));
+    }
+
+    @Override
    public Mono<Resource> postResource(Mono<Resource> resourceMono) {
       return this.kafkaService.sendResourceRecord(resourceMono).map(Optional::get);
    }
@@ -52,18 +57,25 @@ public class ResourceServiceImpl implements ResourceService{
    }
 
    @Override
-     public Mono<Boolean> shareResourceFlag(String ownerId, String resourceId, boolean flag) {
-
-               return null;
+   public Mono<Boolean> shareResource(String userId, String resourceId, boolean flag) {
+       Mono<Optional<Resource>> sharableResource = getResourceByID(resourceId);
+       return sharableResource.flatMap(shareResource -> { Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(shareResource.get().getResourceId()));
+           if (resourceOptional.isEmpty()) return Mono.just(false);
+           return Mono.just(resourceOptional.get()).flatMap(updatedResource -> {
+               if (flag) updatedResource.getResourceViewers().remove(userId);
+               else updatedResource.getResourceViewers().add(userId);
+               return this.kafkaService.sendResourceRecord(Mono.just(updatedResource)).map(Optional::isPresent);
+           });
+       });
    }
 
    @Override
    public Mono<Boolean> deleteResource(String resourceId) {
-      Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(resourceId));
-      if(resourceOptional.isEmpty()) return Mono.empty();
-      Resource resource = resourceOptional.get();
-      resource.setActive(false);
-      return this.kafkaService.sendResourceRecord(Mono.just(resource)).map(Optional::isPresent);
+          Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(resourceId));
+          if(resourceOptional.isEmpty()) return Mono.empty();
+          Resource resource = resourceOptional.get();
+          resource.setActive(false);
+          return this.kafkaService.sendResourceRecord(Mono.just(resource)).map(Optional::isPresent);
    }
 
 

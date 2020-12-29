@@ -12,7 +12,7 @@ public class Resource {
     private final String resourceId = UUID.randomUUID().toString();
     private final Date resourceCreationDate = Calendar.getInstance().getTime();
     private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
-    private String resourceUrl;// what is S3?
+    private String resourceUrl;
     private String resourcesOwnerId;
     private boolean isActive =true, isPublic = false;
     private HashSet<String> resourceViewers = new HashSet<>();

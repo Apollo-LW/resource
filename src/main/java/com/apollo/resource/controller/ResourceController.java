@@ -17,21 +17,24 @@ public class ResourceController {
 
     //there is no get resource by Id?
 
+    @GetMapping(value ="/{resourceId}")
+    public Mono<Resource> getResource (@PathVariable String resourceId){
+        return this.resourceService.getResourceByID(resourceId).map(Optional::get);
+    }
 
     @PostMapping(value = "/")
     public Mono<Resource> createResource(@RequestBody Resource resource){
         return this.resourceService.postResource(Mono.just(resource));//try
     }
 
-    @PutMapping(value= "/resourceId")
+    @PutMapping(value= "/{resourceId}")
     public Mono<Boolean> updateResource(@RequestBody Resource resource){
         return this.resourceService.updateResource(Mono.just(resource));
     }
 
     @PutMapping(value = "/share/{flag}")
-    public Mono<Boolean> shareResource (@PathVariable ("flag") Boolean flag/*,@RequestBody String userId, String resourceId*/){
-        return null;
-        //return this.resourceService.shareResourceFlag(userId,resourceId,flag);
+    public Mono<Boolean> shareResource (@PathVariable ("flag") Boolean flag ,@RequestBody String userId, String resourceId){
+        return this.resourceService.shareResource(userId,resourceId,flag);
     }
 
 

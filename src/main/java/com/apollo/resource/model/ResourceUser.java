@@ -10,7 +10,6 @@ import java.util.UUID;
 @Data
 public class ResourceUser {
 
-    private final String userId = UUID.randomUUID().toString();
     private HashSet<Resource> userResources = new HashSet<>();
 
     public ResourceUser addResource (Resource resource){
