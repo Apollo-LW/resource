@@ -17,8 +17,12 @@ public class Resource {
     private boolean isActive =true, isPublic = false;
     private HashSet<String> resourceViewers = new HashSet<>();
 
-    public void addResourceViewer (List<String> ViewersIds){
-        this.resourceViewers.addAll(ViewersIds);
+    public void addResourceViewer (String userId){
+        this.resourceViewers.add(userId);
+    }
+    
+     public void removeResourceViewer (String userId){
+        this.resourceViewers.remove(userId);
     }
 
 
