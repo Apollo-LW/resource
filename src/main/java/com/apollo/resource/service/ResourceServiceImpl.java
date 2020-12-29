@@ -62,8 +62,8 @@ public class ResourceServiceImpl implements ResourceService{
        return sharableResource.flatMap(shareResource -> { Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(shareResource.get().getResourceId()));
            if (resourceOptional.isEmpty()) return Mono.just(false);
            return Mono.just(resourceOptional.get()).flatMap(updatedResource -> {
-               if (flag) updatedResource.getResourceViewers().remove(userId);
-               else updatedResource.getResourceViewers().add(userId);
+               if (flag) updatedResource.removeResourceViewer(userId);
+               else updatedResource.addResourceViewer(userId);
                return this.kafkaService.sendResourceRecord(Mono.just(updatedResource)).map(Optional::isPresent);
            });
        });
