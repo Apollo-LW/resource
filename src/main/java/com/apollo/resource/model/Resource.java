@@ -16,8 +16,8 @@ public class Resource {
     private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
     private ResourceType resourceType;
 
-    AmazonS3Client s3Client = (AmazonS3Client) AmazonS3ClientBuilder.defaultClient();
-    private String resourceUrl = s3Client.getUrl(resourceName,resourceId).toString();
+    //AmazonS3Client s3Client = (AmazonS3Client) AmazonS3ClientBuilder.defaultClient();
+    //private String resourceUrl = s3Client.getUrl(resourceName,resourceId).toString();
 
     private String resourcesOwnerId;
     private boolean isActive =true, isPublic = false;
