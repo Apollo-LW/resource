@@ -14,6 +14,7 @@ public class Resource {
     private final String resourceId = UUID.randomUUID().toString();
     private final Date resourceCreationDate = Calendar.getInstance().getTime();
     private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
+    private ResourceType resourceType;
 
     AmazonS3Client s3Client = (AmazonS3Client) AmazonS3ClientBuilder.defaultClient();
     private String resourceUrl = s3Client.getUrl(resourceName,resourceId).toString();

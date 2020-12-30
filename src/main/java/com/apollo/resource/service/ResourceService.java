@@ -1,7 +1,7 @@
 package com.apollo.resource.service;
 
 import com.apollo.resource.model.Resource;
-import reactor.core.publisher.Flux;
+import com.apollo.resource.model.SharableResource;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -14,7 +14,7 @@ public interface ResourceService {
 
     Mono<Boolean> updateResource(Mono<Resource> resourceMono);
 
-    Mono<Boolean> shareResource(String userId, String resourceId, boolean flag);
+    Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono, boolean flag);
 
     Mono<Boolean> deleteResource (String resourceId);
 }

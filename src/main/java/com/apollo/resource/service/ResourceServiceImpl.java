@@ -2,6 +2,7 @@ package com.apollo.resource.service;
 
 import com.apollo.resource.kafka.KafkaService;
 import com.apollo.resource.model.Resource;
+import com.apollo.resource.model.SharableResource;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -57,13 +58,12 @@ public class ResourceServiceImpl implements ResourceService{
    }
 
    @Override
-   public Mono<Boolean> shareResource(String userId, String resourceId, boolean flag) {
-       Mono<Optional<Resource>> sharableResource = getResourceByID(resourceId);
-       return sharableResource.flatMap(shareResource -> { Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(shareResource.get().getResourceId()));
+   public Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono, boolean flag) {
+       return sharableResourceMono.flatMap(shareResource -> { Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(shareResource.getResourceId()));
            if (resourceOptional.isEmpty()) return Mono.just(false);
            return Mono.just(resourceOptional.get()).flatMap(updatedResource -> {
-               if (flag) updatedResource.removeResourceViewer(userId);
-               else updatedResource.addResourceViewer(userId);
+               if (flag) updatedResource.removeResourceViewer(shareResource.getUserId());
+               else updatedResource.addResourceViewer(shareResource.getUserId());
                return this.kafkaService.sendResourceRecord(Mono.just(updatedResource)).map(Optional::isPresent);
            });
        });
