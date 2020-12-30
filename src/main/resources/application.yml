@@ -31,8 +31,8 @@ spring:
           binder:
             application-id: apollo-resource
       bindings:
-        courseProcessor-in-0.destination: resource
-        courseProcessor-out-0.destination: resource-state-store
+        resourceProcessor-in-0.destination: resource
+        resourceProcessor-out-0.destination: resource-state-store
 
 server:
   port: 8081
