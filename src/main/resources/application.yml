@@ -35,4 +35,4 @@ spring:
         resourceProcessor-out-0.destination: resource-state-store
 
 server:
-  port: 8081
+  port: 8084

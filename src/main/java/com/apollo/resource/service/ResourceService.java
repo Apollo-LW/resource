@@ -10,11 +10,11 @@ public interface ResourceService {
 
     Mono<Optional<Resource>> getResourceByID (String resourceId);
 
-    Mono<Resource> postResource(Mono<Resource> resourceMono);
+    Mono<Resource> createResource(Mono<Resource> resourceMono);
 
     Mono<Boolean> updateResource(Mono<Resource> resourceMono);
 
-    Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono, boolean flag);
+    Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono , Boolean flag);
 
     Mono<Boolean> deleteResource (String resourceId);
 }

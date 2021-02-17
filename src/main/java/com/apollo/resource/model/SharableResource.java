@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class SharableResource {
+
     private String userId, resourceId;
+
 }
 

@@ -10,10 +10,12 @@ import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Service
 public class KafkaResourceProcessor {
 
     @Value("${resource.kafka.store}")
@@ -22,20 +24,19 @@ public class KafkaResourceProcessor {
     private String resourceUserStateStoreName;
 
     @Bean
-    public Function<KStream<String , Resource>, KTable<String , Resource>> resourceProcessor() {
-
+    public Function<KStream<String, Resource>, KTable<String, Resource>> resourceProcessor() {
         return resourceKStream -> {
-            resourceKStream.flatMap((resourceId, resource) -> resource.getResourceViewers().stream().map(viewerId -> new KeyValue<String, Resource>(viewerId, resource))
+            resourceKStream.flatMap((resourceId , resource) -> resource.getResourceViewers().stream().map(viewerId -> new KeyValue<String, Resource>(viewerId , resource))
                     .collect(Collectors.toSet()))
-                    .groupByKey(Grouped.with(Serdes.String(), CustomSerdes.resourceSerde()))
-                    .aggregate(ResourceUser::new, (viewerId, resource, resourceUser) -> resourceUser.addResource(resource), Materialized.with(Serdes.String(),
+                    .groupByKey(Grouped.with(Serdes.String() , CustomSerdes.resourceSerde()))
+                    .aggregate(ResourceUser::new , (viewerId , resource , resourceUser) -> resourceUser.addResource(resource) , Materialized.with(Serdes.String() ,
                             CustomSerdes.resourceUserSerde()))
                     .toStream()
-                    .groupByKey(Grouped.with(Serdes.String(), CustomSerdes.resourceUserSerde()))
-                    .reduce((resourceUser, updateResourceUser) -> updateResourceUser, Materialized.as(this.resourceUserStateStoreName));
+                    .groupByKey(Grouped.with(Serdes.String() , CustomSerdes.resourceUserSerde()))
+                    .reduce((resourceUser , updateResourceUser) -> updateResourceUser , Materialized.as(this.resourceUserStateStoreName));
 
 
-        return resourceKStream.groupByKey().reduce((resource, updatedResource) -> updatedResource, Materialized.as(this.resourceStateStoreName));
+            return resourceKStream.groupByKey().reduce((resource , updatedResource) -> updatedResource , Materialized.as(this.resourceStateStoreName));
         };
     }
 }

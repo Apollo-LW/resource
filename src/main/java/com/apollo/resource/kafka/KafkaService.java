@@ -10,7 +10,6 @@ import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
 
-
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -21,8 +20,6 @@ public class KafkaService {
     @Value("${resource.kafka.topic}")
     private String resourceTopicName;
     private final KafkaSender<String, Resource> resourceKafkaSender;
-
-    
 
     public Mono<Optional<Resource>> sendResourceRecord(Mono<Resource> resourceMono){
         return resourceMono.flatMap(resource -> this.resourceKafkaSender
