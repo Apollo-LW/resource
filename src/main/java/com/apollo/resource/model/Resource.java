@@ -12,9 +12,20 @@ public class Resource {
 
     private final String resourceId = UUID.randomUUID().toString();
     private final Date resourceCreationDate = Calendar.getInstance().getTime();
-    private String resourceName, resourceUrl, resourcesOwnerId;
-    private boolean isActive, isPublic;
-    private HashSet<String> resourceViewers;
+    private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
+    private ResourceType resourceType;
+    private String resourcesOwnerId, resourceUrl;
+    private Boolean isActive = true, isPublic = false;
+    private HashSet<String> resourceViewers = new HashSet<>();
+
+    public void addResourceViewer(String userId) {
+        this.resourceViewers.add(userId);
+    }
+
+    public void removeResourceViewer(String userId) {
+        this.resourceViewers.remove(userId);
+    }
+
 
 }
 

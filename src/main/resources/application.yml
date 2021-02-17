@@ -1,0 +1,38 @@
+user:
+  kafka:
+    store: resource-user-state-store
+
+resource:
+  kafka:
+    server: localhost:9092
+    topic: resource
+    replicates: 1
+    partitions: 1
+    store: resource-state-store
+    retention: -1
+    acks: all
+    retries: 10
+    requestimeout: 5000
+    batch: 163850
+    linger: 100
+    max-in-flight: 1
+    client-id: apollo-resource
+    group-id: apollo-resource-group
+    offset: latest
+
+
+spring:
+  cloud:
+    function:
+      definition: resourceProcessor;
+    stream:
+      kafka:
+        streams:
+          binder:
+            application-id: apollo-resource
+      bindings:
+        resourceProcessor-in-0.destination: resource
+        resourceProcessor-out-0.destination: resource-state-store
+
+server:
+  port: 8084
