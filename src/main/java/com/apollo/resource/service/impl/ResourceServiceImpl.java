@@ -41,7 +41,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public Mono<Optional<Resource>> saveResource(final Mono<Resource> resourceMono) {
-        return this.kafkaService.sendResourceRecord(resourceMono);
+        return this.kafkaService.sendResourceRecord(resourceMono).;
     }
 
     @Override
