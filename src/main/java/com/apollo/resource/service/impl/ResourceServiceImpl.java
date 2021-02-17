@@ -18,12 +18,11 @@ import java.util.Optional;
 @Service
 public class ResourceServiceImpl implements ResourceService {
 
-    private final InteractiveQueryService interactiveQueryService;
-    private final KafkaService kafkaService;
     @Value("${resource.kafka.store}")
     private String resourceStateStoreName;
+    private final KafkaService kafkaService;
+    private final InteractiveQueryService interactiveQueryService;
     private ReadOnlyKeyValueStore<String, Resource> resourceStateStore;
-
 
     private ReadOnlyKeyValueStore<String, Resource> getResourceStateStore() {
         if (this.resourceStateStore == null)
@@ -31,52 +30,52 @@ public class ResourceServiceImpl implements ResourceService {
         return this.resourceStateStore;
     }
 
+    private Boolean isNotValid(final Optional<Resource> optionalResource , final String ownerId) {
+        return optionalResource.isEmpty() || !optionalResource.get().getIsActive() || optionalResource.get().doesNotHaveOwner(ownerId);
+    }
 
     @Override
-    public Mono<Optional<Resource>> getResourceByID(String resourceId) {
+    public Mono<Optional<Resource>> getResourceById(final String resourceId) {
         return Mono.just(Optional.ofNullable(this.getResourceStateStore().get(resourceId)));
     }
 
     @Override
-    public Mono<Resource> createResource(Mono<Resource> resourceMono) {
-        return this.kafkaService.sendResourceRecord(resourceMono).map(Optional::get);
+    public Mono<Optional<Resource>> saveResource(final Mono<Resource> resourceMono) {
+        return this.kafkaService.sendResourceRecord(resourceMono);
     }
 
     @Override
-    public Mono<Boolean> updateResource(Mono<Resource> resourceMono) {
-        return resourceMono.flatMap(resource -> {
-            Optional<Resource> resourceOptional = Optional.ofNullable(this.resourceStateStore.get(resource.getResourceId()));
-            if (resourceOptional.isEmpty()) return Mono.empty();
+    public Mono<Boolean> updateResource(final Mono<Resource> resourceMono , final String ownerId) {
+        return resourceMono.flatMap(resource -> this.getResourceById(resource.getResourceId()).flatMap(resourceOptional -> {
+            if (this.isNotValid(resourceOptional , ownerId)) return Mono.just(false);
             Resource updatedResource = resourceOptional.get();
-            if (!updatedResource.getIsActive()) return Mono.empty();
-            updatedResource.setResourceName(resource.getResourceName());
             updatedResource.setIsActive(resource.getIsActive());
             updatedResource.setIsPublic(resource.getIsPublic());
-            updatedResource.setResourcesOwnerId(resource.getResourcesOwnerId());
             updatedResource.setResourceUrl(resource.getResourceUrl());
+            updatedResource.setResourceName(resource.getResourceName());
             return this.kafkaService.sendResourceRecord(resourceMono).map(Optional::isPresent);
-        });
+        }));
     }
 
     @Override
-    public Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono , Boolean flag) {
-        return sharableResourceMono.flatMap(shareResource -> {
-            Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(shareResource.getResourceId()));
-            if (resourceOptional.isEmpty()) return Mono.just(false);
-            return Mono.just(resourceOptional.get()).flatMap(updatedResource -> {
-                if (flag) updatedResource.removeResourceViewer(shareResource.getUserId());
-                else updatedResource.addResourceViewer(shareResource.getUserId());
-                return this.kafkaService.sendResourceRecord(Mono.just(updatedResource)).map(Optional::isPresent);
-            });
-        });
+    public Mono<Boolean> shareResource(final Mono<SharableResource> sharableResourceMono , final Boolean isAdd) {
+        return sharableResourceMono.flatMap(sharableResource -> this.getResourceById(sharableResource.getResourceId()).flatMap(resourceOptional -> {
+            if (this.isNotValid(resourceOptional , sharableResource.getOwnerId())) return Mono.just(false);
+            Resource resource = resourceOptional.get();
+            Boolean isShared;
+            if (isAdd) isShared = resource.addResourceViewers(sharableResource.getUserIds());
+            else isShared = resource.removeResourceViewers(sharableResource.getUserIds());
+            return this.kafkaService.sendResourceRecord(Mono.just(resource)).map(sharedResource -> sharedResource.isPresent() && isShared);
+        }));
     }
 
     @Override
-    public Mono<Boolean> deleteResource(String resourceId) {
-        Optional<Resource> resourceOptional = Optional.ofNullable(this.getResourceStateStore().get(resourceId));
-        if (resourceOptional.isEmpty()) return Mono.empty();
-        Resource resource = resourceOptional.get();
-        resource.setIsActive(false);
-        return this.kafkaService.sendResourceRecord(Mono.just(resource)).map(Optional::isPresent);
+    public Mono<Boolean> deleteResource(final String resourceId , final String ownerId) {
+        return this.getResourceById(resourceId).flatMap(resourceOptional -> {
+            if (this.isNotValid(resourceOptional , ownerId)) return Mono.just(false);
+            Resource resource = resourceOptional.get();
+            resource.setIsActive(false);
+            return this.kafkaService.sendResourceRecord(Mono.just(resource)).map(Optional::isPresent);
+        });
     }
 }
