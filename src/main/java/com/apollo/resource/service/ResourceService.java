@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface ResourceService {
 
-    Mono<Optional<Resource>> getResourceByID (String resourceId);
+    Mono<Optional<Resource>> getResourceById(final String resourceId);
 
-    Mono<Resource> createResource(Mono<Resource> resourceMono);
+    Mono<Optional<Resource>> saveResource(final Mono<Resource> resourceMono);
 
-    Mono<Boolean> updateResource(Mono<Resource> resourceMono);
+    Mono<Boolean> updateResource(final Mono<Resource> resourceMono , final String ownerId);
 
-    Mono<Boolean> shareResource(Mono<SharableResource> sharableResourceMono , Boolean flag);
+    Mono<Boolean> shareResource(final Mono<SharableResource> sharableResourceMono , final Boolean isAdd);
 
-    Mono<Boolean> deleteResource (String resourceId);
+    Mono<Boolean> deleteResource(final String resourceId , final String ownerId);
 }

@@ -1,10 +1,10 @@
 package com.apollo.resource.kafka;
 
-import org.jetbrains.annotations.Contract;
 import com.apollo.resource.model.Resource;
 import com.apollo.resource.model.ResourceUser;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.jetbrains.annotations.Contract;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
