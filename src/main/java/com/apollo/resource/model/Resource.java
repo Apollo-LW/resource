@@ -2,10 +2,7 @@ package com.apollo.resource.model;
 
 import lombok.Data;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class Resource {
@@ -14,18 +11,21 @@ public class Resource {
     private final Date resourceCreationDate = Calendar.getInstance().getTime();
     private String resourceName = this.resourceId + "-" + this.resourceCreationDate;
     private ResourceType resourceType;
-    private String resourcesOwnerId, resourceUrl;
+    private String resourceUrl;
     private Boolean isActive = true, isPublic = false;
-    private HashSet<String> resourceViewers = new HashSet<>();
+    private Set<String> resourcesOwners = new HashSet<>(), resourceViewers = new HashSet<>();
 
-    public void addResourceViewer(String userId) {
-        this.resourceViewers.add(userId);
+    public Boolean addResourceViewers(Set<String> userIds) {
+        return this.resourceViewers.addAll(userIds);
     }
 
-    public void removeResourceViewer(String userId) {
-        this.resourceViewers.remove(userId);
+    public Boolean removeResourceViewers(Set<String> userIds) {
+        return this.resourceViewers.removeAll(userIds);
     }
 
+    public Boolean doesNotHaveOwner(String ownerId) {
+        return !this.resourcesOwners.contains(ownerId);
+    }
 
 }
 

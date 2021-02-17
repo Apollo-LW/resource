@@ -5,6 +5,6 @@ import reactor.core.publisher.Flux;
 
 public interface ResourceUserService {
 
-    Flux<Resource> getUserResources(String userId);
+    Flux<Resource> getUserResources(final String userId);
 
 }
