@@ -24,15 +24,21 @@ resource:
 spring:
   cloud:
     function:
-      definition: resourceProcessor;
+      definition: resourceProcessorState;resourceUserProcessorState;
     stream:
       kafka:
         streams:
           binder:
-            application-id: apollo-resource
+            functions:
+              resourceProcessorState:
+                application-id: apollo-resource
+              resourceUserProcessorState:
+                application-id: apollo-resource-user
       bindings:
-        resourceProcessor-in-0.destination: resource
-        resourceProcessor-out-0.destination: resource-state-store
+        resourceProcessorState-in-0.destination: ${resource.kafka.topic}
+        resourceProcessorState-out-0.destination: ${resource.kafka.store}
+        resourceUserProcessorState-in-0.destination: ${resource.kafka.topic}
+        resourceUserProcessorState-out-0.destination: ${user.kafka.store}
 
 server:
   port: 8084
